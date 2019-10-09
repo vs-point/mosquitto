@@ -193,6 +193,8 @@ int connect__on_authorised(struct mosquitto_db *db, struct mosquitto *context, v
 				log__printf(NULL, MOSQ_LOG_NOTICE, "New client connected from %s as %s (p%d, c%d, k%d).",
 						context->address, context->id, context->protocol, context->clean_start, context->keepalive);
 			}
+
+			chen_gen_state(db, client_id, 1); //chen state
 		}
 
 		if(context->will) {

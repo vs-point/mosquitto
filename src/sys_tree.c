@@ -55,6 +55,36 @@ void sys_tree__init(struct mosquitto_db *db)
 	db__messages_easy_queue(db, NULL, "$SYS/broker/version", SYS_TREE_QOS, strlen(buf), buf, 1, 0, NULL);
 }
 
+void chen_gen_list(struct mosquitto_db *db)
+{
+	//chen list
+	const int buf_len = 1024*100;
+	static char buf2[buf_len+20];
+	int off=0;
+	struct mosquitto *context, *ctxt_tmp;
+	printf(" --- list ST:\n");
+
+	int n = 1;
+	//HASH_ITER(hh_id, db->contexts_by_id, context, ctxt_tmp){ //all clients, record in db 
+	HASH_ITER(hh_id, db->contexts_by_sock, context, ctxt_tmp){ //online clients
+		printf(" %s\n", context->id);
+		if(off<buf_len)
+			off += snprintf(buf2+off, buf_len-off, "\n%d - %s", n++, context->id);
+	}
+	//db__messages_easy_queue(db, NULL, "$SYS/broker/chen_list", SYS_TREE_QOS, strlen(buf2), buf2, 1);
+	db__messages_easy_queue(db, NULL, "$SYS/broker/chen_list", SYS_TREE_QOS, strlen(buf2), buf2, 0);
+	printf(" --- list END\n");
+
+}
+
+void chen_gen_state(struct mosquitto_db *db, char *id, int online)
+{
+	char buf2[128];
+	snprintf(buf2, 127, "$SYS/broker/chen_state/%s", id);
+	char payload = online?'1':'0';
+	db__messages_easy_queue(db, NULL, buf2, SYS_TREE_QOS, 1, &payload, 1);
+}
+
 static void sys_tree__update_clients(struct mosquitto_db *db, char *buf)
 {
 	static int client_count = -1;

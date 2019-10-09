@@ -25,7 +25,7 @@ Contributors:
 #include "packet_mosq.h"
 #include "property_mosq.h"
 
-
+extern void chen_gen_list(struct mosquitto_db *db);
 
 int handle__subscribe(struct mosquitto_db *db, struct mosquitto *context)
 {
@@ -78,6 +78,7 @@ int handle__subscribe(struct mosquitto_db *db, struct mosquitto *context)
 		/* Note - User Property not handled */
 	}
 
+	char chen_sub[128] = ""; //chen list
 	while(context->in_packet.pos < context->in_packet.remaining_length){
 		sub = NULL;
 		if(packet__read_string(&context->in_packet, &sub, &slen)){
@@ -86,6 +87,7 @@ int handle__subscribe(struct mosquitto_db *db, struct mosquitto *context)
 		}
 
 		if(sub){
+			strncpy(chen_sub, sub, 127); //chen list
 			if(!slen){
 				log__printf(NULL, MOSQ_LOG_INFO,
 						"Empty subscription string from %s, disconnecting.",
@@ -206,6 +208,11 @@ int handle__subscribe(struct mosquitto_db *db, struct mosquitto *context)
 	}
 	if(send__suback(context, mid, payloadlen, payload)) rc = 1;
 	mosquitto__free(payload);
+
+	//chen list
+	printf("chen_sub: %s\n", chen_sub);
+	if(!strcmp(chen_sub, "$SYS/broker/chen_list"))
+		chen_gen_list(db);
 
 #ifdef WITH_PERSISTENCE
 	db->persistence_changes++;
