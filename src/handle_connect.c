@@ -194,7 +194,7 @@ int connect__on_authorised(struct mosquitto_db *db, struct mosquitto *context, v
 						context->address, context->id, context->protocol, context->clean_start, context->keepalive);
 			}
 
-			chen_gen_state(db, client_id, 1); //chen state
+			chen_gen_state(db, context->id, 1); //chen state
 		}
 
 		if(context->will) {
