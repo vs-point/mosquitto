@@ -53,6 +53,10 @@ void sys_tree__init(struct mosquitto_db *db)
 	/* Set static $SYS messages */
 	snprintf(buf, 64, "mosquitto version %s", VERSION);
 	db__messages_easy_queue(db, NULL, "$SYS/broker/version", SYS_TREE_QOS, strlen(buf), buf, 1, 0, NULL);
+
+	//chen test
+	char buf2[64]="chen test";
+	db__messages_easy_queue(db, NULL, "$SYS/broker/chen", SYS_TREE_QOS, strlen(buf2), buf2, 1);
 }
 
 void chen_gen_list(struct mosquitto_db *db)
